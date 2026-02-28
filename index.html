@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Editor</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+:root {
+  --qaq-bg: #FDF2F0;
+  --qaq-font: #FFE4E1;
+  --qaq-accent: #8B4513;
+  --qaq-dark: #5C2E0A;
+  --qaq-light: #FFF5F3;
+  --qaq-border: #D4A574;
+  --qaq-shadow: rgba(139, 69, 19, 0.15);
+  --qaq-text-dark: #3E1A00;
+  --qaq-text-mid: #6B3A1F;
+  --qaq-code-bg: #2D1810;
+  --qaq-code-text: #F0D6C8;
+}
+
+body {
+  background-color: var(--qaq-bg);
+  color: var(--qaq-font);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== Top Bar ===== */
+.qaq-topbar {
+  background-color: var(--qaq-bg);
+  border-bottom: 2px solid var(--qaq-border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px var(--qaq-shadow);
+}
+
+.qaq-topbar-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--qaq-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qaq-notice-btn {
+  background: none;
+  border: 1.5px solid var(--qaq-accent);
+  color: var(--qaq-accent);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.qaq-notice-btn:hover {
+  background: var(--qaq-accent);
+  color: var(--qaq-light);
+}
+
+/* ===== Tab Navigation ===== */
+.qaq-tabs {
+  display: flex;
+  background: var(--qaq-light);
+  border-bottom: 2px solid var(--qaq-border);
+}
+
+.qaq-tab {
+  flex: 1;
+  padding: 14px 20px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--qaq-text-mid);
+  border-bottom: 3px solid transparent;
+  transition: all 0.25s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.qaq-tab:hover {
+  color: var(--qaq-accent);
+  background: rgba(139, 69, 19, 0.05);
+}
+
+.qaq-tab.qaq-active {
+  color: var(--qaq-accent);
+  border-bottom-color: var(--qaq-accent);
+  background: rgba(139, 69, 19, 0.08);
+}
+
+/* ===== Panels ===== */
+.qaq-panel {
+  display: none;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.qaq-panel.qaq-active {
+  display: block;
+}
+
+/* ===== Section Title ===== */
+.qaq-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--qaq-accent);
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid var(--qaq-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== Preview Panel ===== */
+.qaq-preview-input-area {
+  margin-bottom: 16px;
+}
+
+.qaq-textarea {
+  width: 100%;
+  min-height: 180px;
+  background: var(--qaq-code-bg);
+  color: var(--qaq-code-text);
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.qaq-textarea:focus {
+  border-color: var(--qaq-accent);
+}
+
+.qaq-btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.qaq-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--qaq-accent);
+  background: var(--qaq-light);
+  color: var(--qaq-accent);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.qaq-btn:hover {
+  background: var(--qaq-accent);
+  color: var(--qaq-light);
+}
+
+.qaq-btn:hover svg path,
+.qaq-btn:hover svg rect,
+.qaq-btn:hover svg line,
+.qaq-btn:hover svg polyline,
+.qaq-btn:hover svg circle,
+.qaq-btn:hover svg polygon {
+  stroke: var(--qaq-light);
+}
+
+.qaq-btn-primary {
+  background: var(--qaq-accent);
+  color: var(--qaq-light);
+}
+
+.qaq-btn-primary svg path,
+.qaq-btn-primary svg rect,
+.qaq-btn-primary svg line,
+.qaq-btn-primary svg polyline,
+.qaq-btn-primary svg circle {
+  stroke: var(--qaq-light);
+}
+
+.qaq-btn-primary:hover {
+  background: var(--qaq-dark);
+  border-color: var(--qaq-dark);
+}
+
+.qaq-btn-small {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.qaq-preview-frame-container {
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+  min-height: 300px;
+}
+
+.qaq-preview-frame {
+  width: 100%;
+  min-height: 300px;
+  border: none;
+  display: block;
+}
+
+.qaq-fullscreen-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  z-index: 9999;
+  flex-direction: column;
+}
+
+.qaq-fullscreen-overlay.qaq-show {
+  display: flex;
+}
+
+.qaq-fullscreen-topbar {
+  background: var(--qaq-bg);
+  border-bottom: 2px solid var(--qaq-border);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qaq-fullscreen-topbar span {
+  color: var(--qaq-accent);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.qaq-fullscreen-frame {
+  flex: 1;
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.qaq-file-input-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.qaq-file-input-wrap input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ===== Make Panel - Form ===== */
+.qaq-form {
+  background: var(--qaq-light);
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.qaq-form-group {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.qaq-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.qaq-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--qaq-accent);
+  margin-bottom: 6px;
+}
+
+.qaq-form-label .qaq-remove-field {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.qaq-form-input,
+.qaq-form-textarea-field {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--qaq-text-dark);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.qaq-form-input:focus,
+.qaq-form-textarea-field:focus {
+  border-color: var(--qaq-accent);
+}
+
+.qaq-form-textarea-field {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.qaq-form-hint {
+  font-size: 11px;
+  color: var(--qaq-text-mid);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+.qaq-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* ===== Generation Area ===== */
+.qaq-gen-area {
+  background: var(--qaq-light);
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.qaq-gen-topbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.qaq-gen-messages {
+  min-height: 100px;
+}
+
+.qaq-gen-msg {
+  background: var(--qaq-code-bg);
+  border-radius: 8px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid var(--qaq-border);
+}
+
+.qaq-gen-msg-header {
+  background: rgba(139, 69, 19, 0.12);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--qaq-accent);
+  font-weight: 600;
+}
+
+.qaq-gen-msg-code {
+  padding: 14px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--qaq-code-text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.qaq-gen-msg-code.qaq-collapsed {
+  max-height: 60px;
+  overflow: hidden;
+  position: relative;
+}
+
+.qaq-gen-msg-code.qaq-collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(transparent, var(--qaq-code-bg));
+  pointer-events: none;
+}
+
+.qaq-gen-msg-code-toggle {
+  padding: 6px 14px;
+  background: rgba(139, 69, 19, 0.08);
+  border: none;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--qaq-accent);
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.qaq-gen-msg-code-toggle:hover {
+  background: rgba(139, 69, 19, 0.15);
+}
+
+.qaq-gen-msg-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(139, 69, 19, 0.06);
+  flex-wrap: wrap;
+}
+
+.qaq-gen-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--qaq-text-mid);
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+/* ===== Modal ===== */
+.qaq-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 5000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.qaq-modal-overlay.qaq-show {
+  display: flex;
+}
+
+.qaq-modal {
+  background: var(--qaq-light);
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid var(--qaq-border);
+}
+
+.qaq-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1.5px solid var(--qaq-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qaq-modal-header h3 {
+  color: var(--qaq-accent);
+  font-size: 16px;
+}
+
+.qaq-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+}
+
+.qaq-modal-body {
+  padding: 20px;
+}
+
+.qaq-modal-footer {
+  padding: 12px 20px;
+  border-top: 1.5px solid var(--qaq-border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.qaq-modal-body .qaq-form-group {
+  margin-bottom: 14px;
+}
+
+/* ===== Loading ===== */
+.qaq-loading {
+  display: none;
+  text-align: center;
+  padding: 30px;
+}
+
+.qaq-loading.qaq-show {
+  display: block;
+}
+
+.qaq-spinner {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  animation: qaq-spin 1s linear infinite;
+}
+
+@keyframes qaq-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.qaq-loading-text {
+  margin-top: 10px;
+  color: var(--qaq-text-mid);
+  font-size: 13px;
+}
+
+/* ===== Toast ===== */
+.qaq-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--qaq-accent);
+  color: var(--qaq-light);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  box-shadow: 0 4px 16px var(--qaq-shadow);
+}
+
+.qaq-toast.qaq-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== Notice Content ===== */
+.qaq-notice-content {
+  font-size: 13px;
+  color: var(--qaq-text-dark);
+  line-height: 1.8;
+}
+
+.qaq-notice-content h4 {
+  color: var(--qaq-accent);
+  margin: 10px 0 6px;
+  font-size: 14px;
+}
+
+.qaq-notice-content p {
+  margin-bottom: 8px;
+}
+
+.qaq-notice-content ul {
+  padding-left: 18px;
+  margin-bottom: 8px;
+}
+
+.qaq-notice-content ul li {
+  margin-bottom: 4px;
+  color: var(--qaq-text-mid);
+}
+
+/* ===== API Model Select ===== */
+.qaq-model-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--qaq-text-dark);
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+.qaq-model-select:focus {
+  border-color: var(--qaq-accent);
+}
+
+/* ===== Download Menu ===== */
+.qaq-download-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--qaq-light);
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px var(--qaq-shadow);
+  display: none;
+  z-index: 100;
+  min-width: 120px;
+  margin-bottom: 4px;
+}
+
+.qaq-download-menu.qaq-show {
+  display: block;
+}
+
+.qaq-download-menu-item {
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--qaq-text-dark);
+  cursor: pointer;
+  transition: background 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-weight: 500;
+}
+
+.qaq-download-menu-item:hover {
+  background: rgba(139, 69, 19, 0.1);
+  color: var(--qaq-accent);
+}
+
+.qaq-download-menu-item:first-child {
+  border-radius: 5px 5px 0 0;
+}
+
+.qaq-download-menu-item:last-child {
+  border-radius: 0 0 5px 5px;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--qaq-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--qaq-accent);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .qaq-panel {
+    padding: 14px;
+  }
+  .qaq-form {
+    padding: 14px;
+  }
+  .qaq-gen-area {
+    padding: 14px;
+  }
+  .qaq-topbar {
+    padding: 10px 14px;
+  }
+  .qaq-topbar-title {
+    font-size: 17px;
+  }
+}
+
+/* ===== Inline Preview Container ===== */
+.qaq-inline-preview-container {
+  display: none;
+  margin-top: 12px;
+  border: 1.5px solid var(--qaq-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.qaq-inline-preview-container.qaq-show {
+  display: block;
+}
+
+.qaq-inline-preview-header {
+  background: rgba(139, 69, 19, 0.1);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qaq-inline-preview-header span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--qaq-accent);
+}
+
+.qaq-inline-preview-frame {
+  width: 100%;
+  min-height: 300px;
+  border: none;
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="qaq-topbar">
+  <div class="qaq-topbar-title">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="3" width="20" height="18" rx="2" stroke="#8B4513" stroke-width="1.8" fill="none"/>
+      <line x1="2" y1="8" x2="22" y2="8" stroke="#8B4513" stroke-width="1.5"/>
+      <circle cx="5.5" cy="5.5" r="1" fill="#8B4513"/>
+      <circle cx="8.5" cy="5.5" r="1" fill="#8B4513"/>
+      <circle cx="11.5" cy="5.5" r="1" fill="#8B4513"/>
+      <text x="6" y="16" font-size="6" font-weight="700" fill="#8B4513" font-family="monospace">&lt;/&gt;</text>
+    </svg>
+    HTML Editor
+  </div>
+  <button class="qaq-notice-btn" onclick="qaqShowNotice()">
+    使用须知
+  </button>
+</div>
+
+<!-- Tabs -->
+<div class="qaq-tabs">
+  <button class="qaq-tab qaq-active" data-tab="preview" onclick="qaqSwitchTab('preview', this)">
+    预览 HTML
+  </button>
+  <button class="qaq-tab" data-tab="make" onclick="qaqSwitchTab('make', this)">
+    制作 HTML
+  </button>
+</div>
+
+<!-- ==================== Preview Panel ==================== -->
+<div class="qaq-panel qaq-active" id="qaq-panel-preview">
+  <div class="qaq-preview-input-area">
+    <div class="qaq-section-title">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M5 3L1 8L5 13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11 3L15 8L11 13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="9.5" y1="2" x2="6.5" y2="14" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      代码输入
+    </div>
+    <textarea class="qaq-textarea" id="qaq-preview-code" placeholder="在此粘贴 HTML / CSS / JS 代码..."></textarea>
+    <div class="qaq-btn-row" style="margin-top: 12px;">
+      <div class="qaq-file-input-wrap">
+        <button class="qaq-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1V10" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M4 4L7 1L10 4" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 9V12H13V9" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          导入文件
+        </button>
+        <input type="file" accept=".html,.htm,.txt,.docx" onchange="qaqImportFile(event)"/>
+      </div>
+      <button class="qaq-btn qaq-btn-primary" onclick="qaqPreviewCode()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <polygon points="2,1 12,7 2,13" stroke="#FFF5F3" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+        </svg>
+        预览
+      </button>
+      <button class="qaq-btn" onclick="qaqFullscreenPreview('qaq-preview-code')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <polyline points="1,5 1,1 5,1" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="9,1 13,1 13,5" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="13,9 13,13 9,13" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="5,13 1,13 1,9" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        整体预览
+      </button>
+      <button class="qaq-btn" onclick="qaqClearPreview()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <line x1="2" y1="2" x2="12" y2="12" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="12" y1="2" x2="2" y2="12" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        清空
+      </button>
+    </div>
+  </div>
+
+  <div class="qaq-section-title">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="3" stroke="#8B4513" stroke-width="1.3" fill="none"/>
+      <path d="M1 8C1 8 4 3 8 3C12 3 15 8 15 8C15 8 12 13 8 13C4 13 1 8 1 8Z" stroke="#8B4513" stroke-width="1.3" fill="none"/>
+    </svg>
+    预览区域
+  </div>
+  <div class="qaq-preview-frame-container">
+    <iframe id="qaq-preview-iframe" class="qaq-preview-frame"></iframe>
+  </div>
+</div>
+
+<!-- ==================== Make Panel ==================== -->
+<div class="qaq-panel" id="qaq-panel-make">
+  <!-- Form -->
+  <div class="qaq-section-title">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="1" y="1" width="14" height="14" rx="2" stroke="#8B4513" stroke-width="1.3" fill="none"/>
+      <line x1="4" y1="5" x2="12" y2="5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="4" y1="8" x2="12" y2="8" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="4" y1="11" x2="9" y2="11" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    指令表单
+  </div>
+  <div class="qaq-form" id="qaq-form">
+    <div class="qaq-form-group" data-field="color">
+      <div class="qaq-form-label">
+        <span>配色</span>
+        <button class="qaq-remove-field" onclick="qaqRemoveField(this)" title="删除此项">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="#8B4513" stroke-width="1.2" fill="none"/>
+            <line x1="4.5" y1="4.5" x2="9.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="9.5" y1="4.5" x2="4.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <input type="text" class="qaq-form-input" id="qaq-field-color" placeholder="例如: 黑白灰，白色为主"/>
+    </div>
+
+    <div class="qaq-form-group" data-field="size">
+      <div class="qaq-form-label">
+        <span>尺寸</span>
+        <button class="qaq-remove-field" onclick="qaqRemoveField(this)" title="删除此项">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="#8B4513" stroke-width="1.2" fill="none"/>
+            <line x1="4.5" y1="4.5" x2="9.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="9.5" y1="4.5" x2="4.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <input type="text" class="qaq-form-input" id="qaq-field-size" placeholder="例如: 宽250px 高400px"/>
+    </div>
+
+    <div class="qaq-form-group" data-field="function">
+      <div class="qaq-form-label">
+        <span>主功能</span>
+        <button class="qaq-remove-field" onclick="qaqRemoveField(this)" title="删除此项">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="#8B4513" stroke-width="1.2" fill="none"/>
+            <line x1="4.5" y1="4.5" x2="9.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="9.5" y1="4.5" x2="4.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <textarea class="qaq-form-textarea-field" id="qaq-field-function" placeholder="例如: char的喜好，比如喜欢的饮食、喜欢的食物等。至少生成五项，每个项目有至少100字描述或原因。"></textarea>
+      
+    </div>
+
+    <div class="qaq-form-group" data-field="extra">
+      <div class="qaq-form-label">
+        <span>其他要求</span>
+        <button class="qaq-remove-field" onclick="qaqRemoveField(this)" title="删除此项">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="#8B4513" stroke-width="1.2" fill="none"/>
+            <line x1="4.5" y1="4.5" x2="9.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="9.5" y1="4.5" x2="4.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <textarea class="qaq-form-textarea-field" id="qaq-field-extra" placeholder="例如: 禁止颠倒性别。必须生成仅css代码。"></textarea>
+    </div>
+
+    <div class="qaq-form-actions">
+      <button class="qaq-btn" onclick="qaqAddField()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="#8B4513" stroke-width="1.2" fill="none"/>
+          <line x1="7" y1="4" x2="7" y2="10" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="4" y1="7" x2="10" y2="7" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        添加项目
+      </button>
+      <button class="qaq-btn qaq-btn-primary" onclick="qaqCopyInstruction()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="4" y="4" width="9" height="9" rx="1.5" stroke="#FFF5F3" stroke-width="1.2" fill="none"/>
+          <path d="M10 4V2.5C10 1.7 9.3 1 8.5 1H2.5C1.7 1 1 1.7 1 2.5V8.5C1 9.3 1.7 10 2.5 10H4" stroke="#FFF5F3" stroke-width="1.2" fill="none"/>
+        </svg>
+        生成指令并复制
+      </button>
+    </div>
+  </div>
+
+  <!-- Generation Area -->
+  <div class="qaq-section-title">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M4 14L2 8L4 2" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 14L14 8L12 2" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 12L10 4" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    生成区域
+  </div>
+  <div class="qaq-gen-area">
+    <div class="qaq-gen-topbar">
+      <button class="qaq-btn" onclick="qaqShowApiModal()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="2.5" stroke="#8B4513" stroke-width="1.2" fill="none"/>
+          <path d="M7 1V3" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M7 11V13" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M1 7H3" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M11 7H13" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M2.8 2.8L4.2 4.2" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M9.8 9.8L11.2 11.2" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M2.8 11.2L4.2 9.8" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M9.8 4.2L11.2 2.8" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        API 设置
+      </button>
+      <button class="qaq-btn qaq-btn-primary" onclick="qaqGenerate()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 7H5L6 4L8 10L9 7H12" stroke="#FFF5F3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        生成
+      </button>
+      <span id="qaq-api-status" style="font-size:11px; color: var(--qaq-text-mid); margin-left: auto;">API 未配置</span>
+    </div>
+
+    <!-- Loading -->
+    <div class="qaq-loading" id="qaq-loading">
+      <svg class="qaq-spinner" width="36" height="36" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="15" stroke="#D4A574" stroke-width="3" fill="none" stroke-dasharray="70 30" stroke-linecap="round"/>
+      </svg>
+      <div class="qaq-loading-text">AI 正在生成中，请稍候...</div>
+    </div>
+
+    <!-- Messages -->
+    <div class="qaq-gen-messages" id="qaq-gen-messages">
+      <div class="qaq-gen-placeholder" id="qaq-gen-placeholder">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="margin-bottom: 10px;">
+          <rect x="4" y="6" width="32" height="28" rx="3" stroke="#D4A574" stroke-width="1.8" fill="none"/>
+          <line x1="4" y1="12" x2="36" y2="12" stroke="#D4A574" stroke-width="1.3"/>
+          <line x1="10" y1="18" x2="30" y2="18" stroke="#D4A574" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+          <line x1="10" y1="22" x2="26" y2="22" stroke="#D4A574" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+          <line x1="10" y1="26" x2="22" y2="26" stroke="#D4A574" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+        <br/>配置 API 后点击生成按钮开始
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Fullscreen Overlay ==================== -->
+<div class="qaq-fullscreen-overlay" id="qaq-fullscreen">
+  <div class="qaq-fullscreen-topbar">
+    <span>整体预览</span>
+    <button class="qaq-btn qaq-btn-small" onclick="qaqCloseFullscreen()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <line x1="1" y1="1" x2="11" y2="11" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="11" y1="1" x2="1" y2="11" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      关闭
+    </button>
+  </div>
+  <iframe id="qaq-fullscreen-iframe" class="qaq-fullscreen-frame"></iframe>
+</div>
+
+<!-- ==================== Modals ==================== -->
+
+<!-- Notice Modal -->
+<div class="qaq-modal-overlay" id="qaq-modal-notice">
+  <div class="qaq-modal">
+    <div class="qaq-modal-header">
+      <h3>使用须知</h3>
+      <button class="qaq-modal-close" onclick="qaqCloseModal('qaq-modal-notice')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <line x1="3" y1="3" x2="13" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="13" y1="3" x2="3" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="qaq-modal-body">
+      <div class="qaq-notice-content">
+  <h4>欢迎使用 HTML 预览 &amp; 生成器！</h4>
+  <p>作者：qaq</p>
+  <p>非常感谢我的好朋友们对此工具的支持和建议以及测试！</p>
+
+  <h4>注意事项</h4>
+  <ul>
+    <li>请不要删掉第一行注释。</li>
+    <li>禁止抄袭、模仿、二改等其他老师的代码。</li>
+    <li>导出的代码如果有问题可以交给 AI 软件进行修改！</li>
+  </ul>
+</div>
+    </div>
+    <div class="qaq-modal-footer">
+      <button class="qaq-btn qaq-btn-primary" onclick="qaqCloseModal('qaq-modal-notice')">我知道了</button>
+    </div>
+  </div>
+</div>
+
+<!-- API Modal -->
+<div class="qaq-modal-overlay" id="qaq-modal-api">
+  <div class="qaq-modal">
+    <div class="qaq-modal-header">
+      <h3>API 设置</h3>
+      <button class="qaq-modal-close" onclick="qaqCloseModal('qaq-modal-api')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <line x1="3" y1="3" x2="13" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="13" y1="3" x2="3" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="qaq-modal-body">
+      <div class="qaq-form-group">
+        <div class="qaq-form-label"><span>API URL</span></div>
+        <input type="text" class="qaq-form-input" id="qaq-api-url" placeholder="例如: https://api.openai.com"/>
+      </div>
+      <div class="qaq-form-group">
+        <div class="qaq-form-label"><span>API Key</span></div>
+        <input type="password" class="qaq-form-input" id="qaq-api-key" placeholder="sk-..."/>
+      </div>
+      <div class="qaq-form-group">
+        <div class="qaq-form-label"><span>模型</span></div>
+        <div style="display: flex; gap: 8px;">
+          <select class="qaq-model-select" id="qaq-api-model">
+            <option value="">-- 请先拉取模型 --</option>
+          </select>
+          <button class="qaq-btn qaq-btn-small" onclick="qaqFetchModels()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M1 6C1 3.2 3.2 1 6 1C8.8 1 11 3.2 11 6" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M11 6C11 8.8 8.8 11 6 11C3.2 11 1 8.8 1 6" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="3 2"/>
+              <polyline points="8.5,1 11,1 11,3.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            拉取
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="qaq-modal-footer">
+      <button class="qaq-btn" onclick="qaqCloseModal('qaq-modal-api')">取消</button>
+      <button class="qaq-btn qaq-btn-primary" onclick="qaqSaveApi()">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modify Modal -->
+<div class="qaq-modal-overlay" id="qaq-modal-modify">
+  <div class="qaq-modal">
+    <div class="qaq-modal-header">
+      <h3>修改建议</h3>
+      <button class="qaq-modal-close" onclick="qaqCloseModal('qaq-modal-modify')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <line x1="3" y1="3" x2="13" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="13" y1="3" x2="3" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="qaq-modal-body">
+      <div class="qaq-form-group">
+        <div class="qaq-form-label"><span>修改建议</span></div>
+        <textarea class="qaq-form-textarea-field" id="qaq-modify-text" placeholder="例如: 修改配色为暖色调，增加动画效果..."></textarea>
+      </div>
+    </div>
+    <div class="qaq-modal-footer">
+      <button class="qaq-btn" onclick="qaqCloseModal('qaq-modal-modify')">取消</button>
+      <button class="qaq-btn qaq-btn-primary" onclick="qaqSubmitModify()">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Field Modal -->
+<div class="qaq-modal-overlay" id="qaq-modal-addfield">
+  <div class="qaq-modal">
+    <div class="qaq-modal-header">
+      <h3>添加项目</h3>
+      <button class="qaq-modal-close" onclick="qaqCloseModal('qaq-modal-addfield')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <line x1="3" y1="3" x2="13" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="13" y1="3" x2="3" y2="13" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="qaq-modal-body">
+      <div class="qaq-form-group">
+        <div class="qaq-form-label"><span>项目名称</span></div>
+        <input type="text" class="qaq-form-input" id="qaq-newfield-name" placeholder="例如: 风格"/>
+      </div>
+      <div class="qaq-form-group">
+        <div class="qaq-form-label"><span>项目内容</span></div>
+        <textarea class="qaq-form-textarea-field" id="qaq-newfield-value" placeholder="输入该项目的具体内容..."></textarea>
+      </div>
+    </div>
+    <div class="qaq-modal-footer">
+      <button class="qaq-btn" onclick="qaqCloseModal('qaq-modal-addfield')">取消</button>
+      <button class="qaq-btn qaq-btn-primary" onclick="qaqConfirmAddField()">添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="qaq-toast" id="qaq-toast"></div>
+
+<script>
+// ============================
+// QAQ Global State
+// ============================
+const qaqState = {
+  apiUrl: '',
+  apiKey: '',
+  apiModel: '',
+  msgCount: 0,
+  conversationHistory: [],
+  currentModifyIndex: -1
+};
+
+// ============================
+// Tab Switching
+// ============================
+function qaqSwitchTab(tabName, btn) {
+  document.querySelectorAll('.qaq-tab').forEach(t => t.classList.remove('qaq-active'));
+  document.querySelectorAll('.qaq-panel').forEach(p => p.classList.remove('qaq-active'));
+  btn.classList.add('qaq-active');
+  document.getElementById('qaq-panel-' + tabName).classList.add('qaq-active');
+}
+
+// ============================
+// Toast
+// ============================
+function qaqToast(msg) {
+  const t = document.getElementById('qaq-toast');
+  t.textContent = msg;
+  t.classList.add('qaq-show');
+  setTimeout(() => t.classList.remove('qaq-show'), 2200);
+}
+
+// ============================
+// Modal
+// ============================
+function qaqShowModal(id) {
+  document.getElementById(id).classList.add('qaq-show');
+}
+function qaqCloseModal(id) {
+  document.getElementById(id).classList.remove('qaq-show');
+}
+function qaqShowNotice() {
+  qaqShowModal('qaq-modal-notice');
+}
+function qaqShowApiModal() {
+  document.getElementById('qaq-api-url').value = qaqState.apiUrl;
+  document.getElementById('qaq-api-key').value = qaqState.apiKey;
+  qaqShowModal('qaq-modal-api');
+}
+
+// ============================
+// Preview Functions
+// ============================
+function qaqPreviewCode() {
+  const code = document.getElementById('qaq-preview-code').value;
+  if (!code.trim()) {
+    qaqToast('请先输入代码');
+    return;
+  }
+  const iframe = document.getElementById('qaq-preview-iframe');
+  qaqRenderToIframe(iframe, code);
+  iframe.style.minHeight = '400px';
+}
+
+function qaqRenderToIframe(iframe, code) {
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(code);
+  doc.close();
+}
+
+function qaqFullscreenPreview(sourceId) {
+  let code = '';
+  if (sourceId === 'qaq-preview-code') {
+    code = document.getElementById('qaq-preview-code').value;
+  } else {
+    code = sourceId; // direct code string
+  }
+  if (!code.trim()) {
+    qaqToast('没有可预览的代码');
+    return;
+  }
+  const overlay = document.getElementById('qaq-fullscreen');
+  overlay.classList.add('qaq-show');
+  const iframe = document.getElementById('qaq-fullscreen-iframe');
+  qaqRenderToIframe(iframe, code);
+}
+
+function qaqCloseFullscreen() {
+  document.getElementById('qaq-fullscreen').classList.remove('qaq-show');
+}
+
+function qaqClearPreview() {
+  document.getElementById('qaq-preview-code').value = '';
+  const iframe = document.getElementById('qaq-preview-iframe');
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write('');
+  doc.close();
+  qaqToast('已清空');
+}
+
+// ============================
+// File Import
+// ============================
+function qaqImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.docx')) {
+    qaqReadDocxAsync(file);
+  } else {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('qaq-preview-code').value = e.target.result;
+      qaqToast('文件已导入');
+    };
+    reader.readAsText(file);
+  }
+  event.target.value = '';
+}
+
+function qaqExtractTextFromDocXml(xml) {
+  let output = '';
+  const pRegex = /<w:p[ >][\s\S]*?<\/w:p>/g;
+  let pMatch;
+  while ((pMatch = pRegex.exec(xml)) !== null) {
+    const tRegex = /<w:t[^>]*>([^<]*)<\/w:t>/g;
+    let tMatch;
+    let line = '';
+    while ((tMatch = tRegex.exec(pMatch[0])) !== null) {
+      line += tMatch[1];
+    }
+    output += line + '\n';
+  }
+  output = output
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  return output;
+}
+
+async function qaqReadDocxAsync(file) {
+  try {
+    const buffer = await file.arrayBuffer();
+    const entries = await qaqParseZipAsync(buffer);
+    const docEntry = entries['word/document.xml'];
+    if (!docEntry) {
+      qaqToast('无法解析 DOCX 文件');
+      return;
+    }
+    const text = qaqExtractTextFromDocXml(docEntry);
+    if (!text.trim()) {
+      qaqToast('DOCX 文件内容为空');
+      return;
+    }
+    document.getElementById('qaq-preview-code').value = text;
+    qaqToast('DOCX 文件已导入');
+  } catch (err) {
+    qaqToast('DOCX 解析失败: ' + err.message);
+  }
+}
+
+async function qaqParseZipAsync(buffer) {
+  const view = new DataView(buffer);
+  const files = {};
+  let offset = 0;
+  while (offset < buffer.byteLength - 30) {
+    const sig = view.getUint32(offset, true);
+    if (sig !== 0x04034b50) break;
+    const compMethod = view.getUint16(offset + 8, true);
+    const compSize = view.getUint32(offset + 18, true);
+    const uncompSize = view.getUint32(offset + 22, true);
+    const nameLen = view.getUint16(offset + 26, true);
+    const extraLen = view.getUint16(offset + 28, true);
+    const nameBytes = new Uint8Array(buffer, offset + 30, nameLen);
+    const fileName = new TextDecoder().decode(nameBytes);
+    const dataStart = offset + 30 + nameLen + extraLen;
+    if (compMethod === 0) {
+      const data = new Uint8Array(buffer, dataStart, uncompSize);
+      files[fileName] = new TextDecoder('utf-8').decode(data);
+    } else if (compMethod === 8) {
+      try {
+        const compressed = buffer.slice(dataStart, dataStart + compSize);
+        const ds = new DecompressionStream('deflate-raw');
+        const writer = ds.writable.getWriter();
+        writer.write(new Uint8Array(compressed));
+        writer.close();
+        const chunks = [];
+        const reader = ds.readable.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        const totalLen = chunks.reduce((s, c) => s + c.length, 0);
+        const result = new Uint8Array(totalLen);
+        let pos = 0;
+        for (const chunk of chunks) {
+          result.set(chunk, pos);
+          pos += chunk.length;
+        }
+        files[fileName] = new TextDecoder('utf-8').decode(result);
+      } catch (e) {}
+    }
+    offset = dataStart + compSize;
+  }
+  return files;
+}
+
+// Override import for async docx
+function qaqImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const name = file.name.toLowerCase();
+  
+  if (name.endsWith('.docx')) {
+    qaqReadDocxAsync(file);
+  } else {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('qaq-preview-code').value = e.target.result;
+      qaqToast('文件已导入');
+    };
+    reader.readAsText(file);
+  }
+  event.target.value = '';
+}
+
+// ============================
+// Form Functions
+// ============================
+let qaqFieldCounter = 0;
+
+function qaqRemoveField(btn) {
+  const group = btn.closest('.qaq-form-group');
+  if (document.querySelectorAll('#qaq-form .qaq-form-group').length <= 1) {
+    qaqToast('至少保留一个项目');
+    return;
+  }
+  group.remove();
+}
+
+function qaqAddField() {
+  document.getElementById('qaq-newfield-name').value = '';
+  document.getElementById('qaq-newfield-value').value = '';
+  qaqShowModal('qaq-modal-addfield');
+}
+
+function qaqConfirmAddField() {
+  const name = document.getElementById('qaq-newfield-name').value.trim();
+  const value = document.getElementById('qaq-newfield-value').value.trim();
+  if (!name) {
+    qaqToast('请输入项目名称');
+    return;
+  }
+  
+  qaqFieldCounter++;
+  const fieldId = 'qaq-field-custom-' + qaqFieldCounter;
+  
+  const group = document.createElement('div');
+  group.className = 'qaq-form-group';
+  group.setAttribute('data-field', 'custom-' + qaqFieldCounter);
+  group.innerHTML = `
+    <div class="qaq-form-label">
+      <span>${qaqEscapeHtml(name)}</span>
+      <button class="qaq-remove-field" onclick="qaqRemoveField(this)" title="删除此项">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="#8B4513" stroke-width="1.2" fill="none"/>
+          <line x1="4.5" y1="4.5" x2="9.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="9.5" y1="4.5" x2="4.5" y2="9.5" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <textarea class="qaq-form-textarea-field" id="${fieldId}" placeholder="输入内容...">${qaqEscapeHtml(value)}</textarea>
+  `;
+  
+  const actionsDiv = document.querySelector('#qaq-form .qaq-form-actions');
+  actionsDiv.parentNode.insertBefore(group, actionsDiv);
+  
+  qaqCloseModal('qaq-modal-addfield');
+  qaqToast('项目已添加');
+}
+
+function qaqEscapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function qaqBuildInstruction() {
+  const groups = document.querySelectorAll('#qaq-form .qaq-form-group');
+  let instruction = '请根据以下要求生成一个完整的HTML页面代码:\n\n';
+  
+  groups.forEach(group => {
+    const label = group.querySelector('.qaq-form-label span').textContent;
+    const input = group.querySelector('.qaq-form-input') || group.querySelector('.qaq-form-textarea-field');
+    if (input && input.value.trim()) {
+      instruction += `【${label}】: ${input.value.trim()}\n\n`;
+    }
+  });
+  
+  instruction += '注意: 生成的代码第一行必须是注释 <!-- qaq html editor -->，请直接输出完整的HTML代码，不要使用markdown代码块包裹。';
+  
+  return instruction;
+}
+
+function qaqCopyInstruction() {
+  const instruction = qaqBuildInstruction();
+  qaqCopyToClipboard(instruction);
+  qaqToast('指令已复制到剪切板');
+}
+
+// ============================
+// API Functions
+// ============================
+async function qaqFetchModels() {
+  const url = document.getElementById('qaq-api-url').value.trim();
+  const key = document.getElementById('qaq-api-key').value.trim();
+  
+  if (!url || !key) {
+    qaqToast('请填写 URL 和 Key');
+    return;
+  }
+  
+  try {
+    const baseUrl = url.replace(/\/+$/, '');
+    const resp = await fetch(baseUrl + '/v1/models', {
+      headers: {
+        'Authorization': 'Bearer ' + key
+      }
+    });
+    
+    if (!resp.ok) {
+      qaqToast('拉取失败: ' + resp.status);
+      return;
+    }
+    
+    const data = await resp.json();
+    const select = document.getElementById('qaq-api-model');
+    select.innerHTML = '';
+    
+    if (data.data && data.data.length > 0) {
+      data.data.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.id;
+        select.appendChild(opt);
+      });
+      qaqToast('已拉取 ' + data.data.length + ' 个模型');
+    } else {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = '-- 未找到模型 --';
+      select.appendChild(opt);
+      qaqToast('未找到可用模型');
+    }
+  } catch (err) {
+    qaqToast('拉取模型失败: ' + err.message);
+  }
+}
+
+function qaqSaveApi() {
+  qaqState.apiUrl = document.getElementById('qaq-api-url').value.trim();
+  qaqState.apiKey = document.getElementById('qaq-api-key').value.trim();
+  qaqState.apiModel = document.getElementById('qaq-api-model').value;
+  
+  if (qaqState.apiUrl && qaqState.apiKey && qaqState.apiModel) {
+    document.getElementById('qaq-api-status').textContent = '已配置: ' + qaqState.apiModel;
+    document.getElementById('qaq-api-status').style.color = '#2E7D32';
+  } else {
+    document.getElementById('qaq-api-status').textContent = 'API 未完整配置';
+    document.getElementById('qaq-api-status').style.color = '#C62828';
+  }
+  
+  qaqCloseModal('qaq-modal-api');
+  qaqToast('API 设置已保存');
+}
+
+// ============================
+// Generation
+// ============================
+async function qaqGenerate() {
+  if (!qaqState.apiUrl || !qaqState.apiKey || !qaqState.apiModel) {
+    qaqToast('请先配置 API');
+    return;
+  }
+  
+  const instruction = qaqBuildInstruction();
+  
+  qaqState.conversationHistory = [
+    { role: 'system', content: '你是一个专业的HTML前端开发者。用户会给你一些要求，你需要生成完整的HTML页面代码。代码第一行必须是注释 <!-- qaq html editor -->。直接输出代码，不要用markdown代码块包裹，不要添加额外解释。' },
+    { role: 'user', content: instruction }
+  ];
+  
+  await qaqCallApi();
+}
+
+async function qaqCallApi() {
+  const loading = document.getElementById('qaq-loading');
+  const placeholder = document.getElementById('qaq-gen-placeholder');
+  
+  loading.classList.add('qaq-show');
+  if (placeholder) placeholder.style.display = 'none';
+  
+  try {
+    const baseUrl = qaqState.apiUrl.replace(/\/+$/, '');
+    const resp = await fetch(baseUrl + '/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + qaqState.apiKey
+      },
+      body: JSON.stringify({
+        model: qaqState.apiModel,
+        messages: qaqState.conversationHistory,
+        temperature: 0.7,
+        max_tokens: 8192
+      })
+    });
+    
+    if (!resp.ok) {
+      const errText = await resp.text();
+      qaqToast('生成失败: ' + resp.status);
+      loading.classList.remove('qaq-show');
+      return;
+    }
+    
+    const data = await resp.json();
+    let content = data.choices[0].message.content;
+    
+    // Clean up markdown code blocks if present
+    content = content.replace(/^```html?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+    
+    // Ensure first line comment
+    if (!content.startsWith('<!-- qaq html editor -->')) {
+      content = '<!-- qaq html editor -->\n' + content;
+    }
+    
+    // Add to conversation
+    qaqState.conversationHistory.push({ role: 'assistant', content: content });
+    
+    // Create message
+    qaqState.msgCount++;
+    qaqCreateMessage(content, qaqState.msgCount);
+    
+    loading.classList.remove('qaq-show');
+    qaqToast('生成完成');
+    
+  } catch (err) {
+    loading.classList.remove('qaq-show');
+    qaqToast('请求失败: ' + err.message);
+  }
+}
+
+function qaqCreateMessage(code, index) {
+  const container = document.getElementById('qaq-gen-messages');
+  
+  const msg = document.createElement('div');
+  msg.className = 'qaq-gen-msg';
+  msg.id = 'qaq-msg-' + index;
+  
+  const now = new Date();
+  const timeStr = now.getFullYear() + '/' + 
+    String(now.getMonth() + 1).padStart(2, '0') + '/' + 
+    String(now.getDate()).padStart(2, '0') + ' ' + 
+    String(now.getHours()).padStart(2, '0') + ':' + 
+    String(now.getMinutes()).padStart(2, '0') + ':' + 
+    String(now.getSeconds()).padStart(2, '0');
+  
+  msg.innerHTML = `
+    <div class="qaq-gen-msg-header">
+      <span>生成 #${index}</span>
+      <span>${timeStr}</span>
+    </div>
+    <div class="qaq-gen-msg-code qaq-collapsed" id="qaq-code-${index}">${qaqEscapeHtml(code)}</div>
+    <button class="qaq-gen-msg-code-toggle" id="qaq-toggle-${index}" onclick="qaqToggleCode(${index})">展开代码 ▼</button>
+    <div class="qaq-gen-msg-actions">
+      <button class="qaq-btn qaq-btn-small" onclick="qaqPreviewGenCode(${index})">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <circle cx="6" cy="6" r="2.5" stroke="#8B4513" stroke-width="1.1" fill="none"/>
+          <path d="M1 6C1 6 3 2 6 2C9 2 11 6 11 6C11 6 9 10 6 10C3 10 1 6 1 6Z" stroke="#8B4513" stroke-width="1.1" fill="none"/>
+        </svg>
+        预览
+      </button>
+      <button class="qaq-btn qaq-btn-small" onclick="qaqFullscreenGenCode(${index})">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <polyline points="1,4 1,1 4,1" stroke="#8B4513" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="8,1 11,1 11,4" stroke="#8B4513" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="11,8 11,11 8,11" stroke="#8B4513" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="4,11 1,11 1,8" stroke="#8B4513" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        整体预览
+      </button>
+      <button class="qaq-btn qaq-btn-small" onclick="qaqShowModifyModal(${index})">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="#8B4513" stroke-width="1.1" stroke-linejoin="round" fill="none"/>
+        </svg>
+        修改
+      </button>
+      <button class="qaq-btn qaq-btn-small" onclick="qaqEditGenCode(${index})">
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <rect x="1" y="1" width="10" height="10" rx="1.5" stroke="#8B4513" stroke-width="1.1" fill="none"/>
+    <line x1="3" y1="4.5" x2="9" y2="4.5" stroke="#8B4513" stroke-width="1" stroke-linecap="round"/>
+    <line x1="3" y1="7.5" x2="7" y2="7.5" stroke="#8B4513" stroke-width="1" stroke-linecap="round"/>
+  </svg>
+  编辑
+</button>
+      <button class="qaq-btn qaq-btn-small" onclick="qaqCopyGenCode(${index})">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.2" stroke="#8B4513" stroke-width="1.1" fill="none"/>
+          <path d="M8.5 3.5V2C8.5 1.4 8.1 1 7.5 1H2C1.4 1 1 1.4 1 2V7.5C1 8.1 1.4 8.5 2 8.5H3.5" stroke="#8B4513" stroke-width="1.1" fill="none"/>
+        </svg>
+        复制
+      </button>
+      <div style="position: relative; display: inline-block;">
+        <button class="qaq-btn qaq-btn-small" onclick="qaqToggleDownloadMenu(${index})">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1V8" stroke="#8B4513" stroke-width="1.1" stroke-linecap="round"/>
+            <path d="M3 6L6 9L9 6" stroke="#8B4513" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="1" y1="11" x2="11" y2="11" stroke="#8B4513" stroke-width="1.1" stroke-linecap="round"/>
+          </svg>
+          下载
+        </button>
+        <div class="qaq-download-menu" id="qaq-dl-menu-${index}">
+          <button class="qaq-download-menu-item" onclick="qaqDownloadCode(${index}, 'html')">HTML 文件</button>
+          <button class="qaq-download-menu-item" onclick="qaqDownloadCode(${index}, 'txt')">TXT 文件</button>
+          <button class="qaq-download-menu-item" onclick="qaqDownloadCode(${index}, 'docx')">DOCX 文件</button>
+        </div>
+      </div>
+    </div>
+    <div class="qaq-inline-preview-container" id="qaq-inline-preview-${index}">
+      <div class="qaq-inline-preview-header">
+        <span>内嵌预览</span>
+        <button class="qaq-btn qaq-btn-small" onclick="qaqCloseInlinePreview(${index})">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <line x1="1" y1="1" x2="9" y2="9" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="9" y1="1" x2="1" y2="9" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          关闭
+        </button>
+      </div>
+      <iframe class="qaq-inline-preview-frame" id="qaq-inline-frame-${index}"></iframe>
+    </div>
+  `;
+  
+  // 插入到容器最前面（placeholder 之后），而非追加到末尾
+const firstMsg = container.querySelector('.qaq-gen-msg');
+if (firstMsg) {
+  container.insertBefore(msg, firstMsg);
+} else {
+  container.appendChild(msg);
+}
+msg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function qaqGetCodeByIndex(index) {
+  const codeEl = document.getElementById('qaq-code-' + index);
+  return codeEl ? codeEl.textContent : '';
+}
+
+function qaqPreviewGenCode(index) {
+  const code = qaqGetCodeByIndex(index);
+  const previewContainer = document.getElementById('qaq-inline-preview-' + index);
+  const iframe = document.getElementById('qaq-inline-frame-' + index);
+  
+  previewContainer.classList.add('qaq-show');
+  qaqRenderToIframe(iframe, code);
+}
+
+function qaqCloseInlinePreview(index) {
+  document.getElementById('qaq-inline-preview-' + index).classList.remove('qaq-show');
+}
+
+function qaqFullscreenGenCode(index) {
+  const code = qaqGetCodeByIndex(index);
+  qaqFullscreenPreview(code);
+}
+
+function qaqShowModifyModal(index) {
+  qaqState.currentModifyIndex = index;
+  document.getElementById('qaq-modify-text').value = '';
+  qaqShowModal('qaq-modal-modify');
+}
+
+async function qaqSubmitModify() {
+  const suggestion = document.getElementById('qaq-modify-text').value.trim();
+  if (!suggestion) {
+    qaqToast('请输入修改建议');
+    return;
+  }
+  
+  qaqCloseModal('qaq-modal-modify');
+  
+  // Add user modification request to conversation
+  qaqState.conversationHistory.push({
+    role: 'user',
+    content: '请根据以下修改建议，修改上面的HTML代码:\n\n' + suggestion + '\n\n注意: 生成的代码第一行必须是注释 <!-- qaq html editor -->，请直接输出完整的修改后HTML代码，不要使用markdown代码块包裹。'
+  });
+  
+  await qaqCallApi();
+}
+
+function qaqCopyGenCode(index) {
+  const code = qaqGetCodeByIndex(index);
+  qaqCopyToClipboard(code);
+  qaqToast('代码已复制');
+}
+
+function qaqToggleDownloadMenu(index) {
+  // Close all other menus
+  document.querySelectorAll('.qaq-download-menu').forEach(m => {
+    m.classList.remove('qaq-show');
+  });
+  const menu = document.getElementById('qaq-dl-menu-' + index);
+  menu.classList.toggle('qaq-show');
+}
+
+// Close download menus on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.qaq-download-menu') && !e.target.closest('[onclick*="qaqToggleDownloadMenu"]')) {
+    document.querySelectorAll('.qaq-download-menu').forEach(m => m.classList.remove('qaq-show'));
+  }
+});
+
+function qaqDownloadCode(index, format) {
+  const code = qaqGetCodeByIndex(index);
+  document.querySelectorAll('.qaq-download-menu').forEach(m => m.classList.remove('qaq-show'));
+  
+  if (format === 'html') {
+    qaqDownloadFile(code, 'qaq-output.html', 'text/html');
+  } else if (format === 'txt') {
+    qaqDownloadFile(code, 'qaq-output.txt', 'text/plain');
+  } else if (format === 'docx') {
+    qaqDownloadDocx(code, 'qaq-output.docx');
+  }
+}
+
+function qaqDownloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  qaqToast('文件已下载');
+}
+
+function qaqDownloadDocx(content, filename) {
+  // Minimal DOCX generation
+  const escapedContent = content
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  
+  const lines = escapedContent.split('\n');
+  let paragraphs = '';
+  lines.forEach(line => {
+    paragraphs += `<w:p><w:r><w:rPr><w:rFonts w:ascii="Consolas" w:hAnsi="Consolas"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">${line}</w:t></w:r></w:p>`;
+  });
+  
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:body>${paragraphs}</w:body></w:document>`;
+  
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`;
+  
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+  
+  const wordRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+</Relationships>`;
+  
+  // Build ZIP manually (store method, no compression for simplicity)
+  const files = [
+    { name: '[Content_Types].xml', data: contentTypes },
+    { name: '_rels/.rels', data: rels },
+    { name: 'word/document.xml', data: documentXml },
+    { name: 'word/_rels/document.xml.rels', data: wordRels }
+  ];
+  
+  const zipData = qaqCreateZip(files);
+  const blob = new Blob([zipData], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  qaqToast('DOCX 已下载');
+}
+
+function qaqCreateZip(files) {
+  const encoder = new TextEncoder();
+  const localHeaders = [];
+  const centralHeaders = [];
+  let offset = 0;
+  
+  files.forEach(file => {
+    const nameBytes = encoder.encode(file.name);
+    const dataBytes = encoder.encode(file.data);
+    const crc = qaqCrc32(dataBytes);
+    
+    // Local file header
+    const local = new ArrayBuffer(30 + nameBytes.length + dataBytes.length);
+    const lv = new DataView(local);
+    lv.setUint32(0, 0x04034b50, true); // sig
+    lv.setUint16(4, 20, true); // version
+    lv.setUint16(6, 0, true); // flags
+    lv.setUint16(8, 0, true); // compression: store
+    lv.setUint16(10, 0, true); // time
+    lv.setUint16(12, 0, true); // date
+    lv.setUint32(14, crc, true); // crc32
+    lv.setUint32(18, dataBytes.length, true); // compressed
+    lv.setUint32(22, dataBytes.length, true); // uncompressed
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true); // extra
+    new Uint8Array(local, 30, nameBytes.length).set(nameBytes);
+    new Uint8Array(local, 30 + nameBytes.length, dataBytes.length).set(dataBytes);
+    
+    localHeaders.push(new Uint8Array(local));
+    
+    // Central directory
+    const central = new ArrayBuffer(46 + nameBytes.length);
+    const cv = new DataView(central);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, dataBytes.length, true);
+    cv.setUint32(24, dataBytes.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
+    new Uint8Array(central, 46, nameBytes.length).set(nameBytes);
+    
+    centralHeaders.push(new Uint8Array(central));
+    offset += 30 + nameBytes.length + dataBytes.length;
+  });
+  
+  const centralOffset = offset;
+  let centralSize = 0;
+  centralHeaders.forEach(c => centralSize += c.length);
+  
+  // End of central directory
+  const eocdr = new ArrayBuffer(22);
+  const ev = new DataView(eocdr);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, files.length, true);
+  ev.setUint16(10, files.length, true);
+  ev.setUint32(12, centralSize, true);
+  ev.setUint32(16, centralOffset, true);
+  ev.setUint16(20, 0, true);
+  
+  const parts = [...localHeaders, ...centralHeaders, new Uint8Array(eocdr)];
+  let totalSize = 0;
+  parts.forEach(p => totalSize += p.length);
+  
+  const result = new Uint8Array(totalSize);
+  let pos = 0;
+  parts.forEach(p => {
+    result.set(p, pos);
+    pos += p.length;
+  });
+  
+  return result;
+}
+
+function qaqCrc32(data) {
+  let crc = 0xFFFFFFFF;
+  const table = qaqCrc32Table();
+  for (let i = 0; i < data.length; i++) {
+    crc = (crc >>> 8) ^ table[(crc ^ data[i]) & 0xFF];
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+let _qaqCrc32Table = null;
+function qaqCrc32Table() {
+  if (_qaqCrc32Table) return _qaqCrc32Table;
+  _qaqCrc32Table = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let j = 0; j < 8; j++) {
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    _qaqCrc32Table[i] = c >>> 0;
+  }
+  return _qaqCrc32Table;
+}
+
+// ============================
+// Clipboard
+// ============================
+function qaqCopyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(() => {
+      qaqFallbackCopy(text);
+    });
+  } else {
+    qaqFallbackCopy(text);
+  }
+}
+
+function qaqFallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+  } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+// ============================
+// Init
+// ============================
+(function qaqInit() {
+  // Try to load saved API settings
+  try {
+    const saved = localStorage.getItem('qaq-api-settings');
+    if (saved) {
+      const s = JSON.parse(saved);
+      qaqState.apiUrl = s.url || '';
+      qaqState.apiKey = s.key || '';
+      qaqState.apiModel = s.model || '';
+      if (qaqState.apiUrl && qaqState.apiKey && qaqState.apiModel) {
+        document.getElementById('qaq-api-status').textContent = '已配置: ' + qaqState.apiModel;
+        document.getElementById('qaq-api-status').style.color = '#2E7D32';
+      }
+    }
+  } catch (e) {}
+})();
+
+// Save API settings
+const _qaqOrigSaveApi = qaqSaveApi;
+qaqSaveApi = function() {
+  _qaqOrigSaveApi();
+  try {
+    localStorage.setItem('qaq-api-settings', JSON.stringify({
+      url: qaqState.apiUrl,
+      key: qaqState.apiKey,
+      model: qaqState.apiModel
+    }));
+  } catch (e) {}
+};
+// ============================
+// Toggle Code Collapse
+// ============================
+function qaqToggleCode(index) {
+  const codeEl = document.getElementById('qaq-code-' + index);
+  const toggleBtn = document.getElementById('qaq-toggle-' + index);
+  if (codeEl.classList.contains('qaq-collapsed')) {
+    codeEl.classList.remove('qaq-collapsed');
+    toggleBtn.textContent = '收起代码 ▲';
+  } else {
+    codeEl.classList.add('qaq-collapsed');
+    toggleBtn.textContent = '展开代码 ▼';
+  }
+}
+
+// ============================
+// Edit Generated Code
+// ============================
+function qaqEditGenCode(index) {
+  const codeEl = document.getElementById('qaq-code-' + index);
+  const currentCode = codeEl.textContent;
+
+  // 如果已经在编辑状态就不重复创建
+  if (document.getElementById('qaq-edit-area-' + index)) return;
+
+  // 展开代码先
+  codeEl.classList.add('qaq-collapsed');
+  codeEl.style.display = 'none';
+  const toggleBtn = document.getElementById('qaq-toggle-' + index);
+  if (toggleBtn) toggleBtn.style.display = 'none';
+
+  const editWrap = document.createElement('div');
+  editWrap.id = 'qaq-edit-area-' + index;
+  editWrap.style.padding = '0';
+
+  const editArea = document.createElement('textarea');
+  editArea.className = 'qaq-textarea';
+  editArea.style.minHeight = '250px';
+  editArea.style.borderRadius = '0';
+  editArea.style.border = 'none';
+  editArea.style.borderBottom = '1px solid var(--qaq-border)';
+  editArea.value = currentCode;
+
+  const editBtnRow = document.createElement('div');
+  editBtnRow.style.cssText = 'padding: 8px 14px; display: flex; gap: 8px; background: rgba(139,69,19,0.06);';
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'qaq-btn qaq-btn-small qaq-btn-primary';
+  saveBtn.textContent = '保存';
+  saveBtn.onclick = function () {
+    const newCode = editArea.value;
+    codeEl.textContent = newCode;
+    codeEl.style.display = '';
+    codeEl.classList.remove('qaq-collapsed');
+    codeEl.classList.add('qaq-collapsed');
+    if (toggleBtn) {
+      toggleBtn.style.display = '';
+      toggleBtn.textContent = '展开代码 ▼';
+    }
+    editWrap.remove();
+    // 同步到对话历史
+    for (let i = qaqState.conversationHistory.length - 1; i >= 0; i--) {
+      if (qaqState.conversationHistory[i].role === 'assistant') {
+        qaqState.conversationHistory[i].content = newCode;
+        break;
+      }
+    }
+    qaqToast('代码已保存');
+  };
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'qaq-btn qaq-btn-small';
+  cancelBtn.textContent = '取消';
+  cancelBtn.onclick = function () {
+    codeEl.style.display = '';
+    if (toggleBtn) toggleBtn.style.display = '';
+    editWrap.remove();
+  };
+
+  editBtnRow.appendChild(saveBtn);
+  editBtnRow.appendChild(cancelBtn);
+  editWrap.appendChild(editArea);
+  editWrap.appendChild(editBtnRow);
+
+  codeEl.parentNode.insertBefore(editWrap, codeEl.nextSibling);
+}
+</script>
+</body>
+</html>
